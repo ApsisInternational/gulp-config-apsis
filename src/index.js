@@ -134,9 +134,8 @@ class Apsis {
 
     defaultFn(gulp) {
         gulp.task('default', 'Sets up the dev environment', () => {
-            return runSequence([
+            return runSequence.use(gulp)([
                 'npm:install',
-                'clean',
                 [ 'stylus', 'eslint' ],
                 'watch',
                 'serve',
@@ -192,8 +191,8 @@ class Apsis {
 
     releaseFn(gulp) {
         gulp.task('release', done => {
-            runSequence(
-                'clean',
+            runSequence.use(gulp)(
+                'clean:dist',
                 'eslint:fail',
                 [ 'copy:dist', 'stylus:dist' ],
                 'commit:dist',
