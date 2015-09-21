@@ -49,20 +49,27 @@ function isObj(x) {
 
 function setupConfig(_config) {
     const defaultConfig = {
-        src: 'src/',
-        karmaConf: 'test/karma.conf.js',
-        stylesheets: 'stylesheets/',
-        jsSrc: 'javascript/',
-        test: 'test/',
-        unitTests: 'test/unit/',
-        serve: 'demo/',
-        dist: {
-            root: 'dist/',
-            stylesheets: 'dist/stylesheets/',
+        paths: {
+            src: 'src/',
+            karmaConf: 'test/karma.conf.js',
+            stylesheets: 'stylesheets/',
+            jsSrc: 'javascript/',
+            test: 'test/',
+            unitTests: 'test/unit/',
+            serve: 'demo/',
+            dist: {
+                root: 'dist/',
+                stylesheets: 'dist/stylesheets/',
+            },
+            lint: [
+                'src/**/*.js',
+                'test/**/*.js',
+                'demo/**/*.js',
+            ],
         },
     };
 
-    return Object.assign(defaultConfig, _config);
+    return deepAssign({}, defaultConfig, _config);
 }
 
 class Apsis {
