@@ -17,6 +17,36 @@ import sourcemaps from 'gulp-sourcemaps';
 import autoprefixer from 'gulp-autoprefixer';
 
 
+function deepAssign(target, ...rest) {
+    let combined = target;
+    rest.forEach(source => {
+        combined = walkSource(combined, source);
+    });
+
+    return combined;
+}
+
+function walkSource(_target, _source) {
+    Object.keys(_source).forEach(key => {
+        const value = _source[key];
+
+        if ( Array.isArray(value) ) {
+            _target[key] = value.slice();
+        } else if ( isObj(value) ) {
+            _target[key] = deepAssign(_target[key] || {}, value);
+        } else if ( value !== undefined ) {
+            _target[key] = value;
+        }
+    });
+
+    return _target;
+}
+
+function isObj(x) {
+    const type = typeof x;
+    return x !== null && (type === 'object' || type === 'function');
+}
+
 function setupConfig(_config) {
     const defaultConfig = {
         src: 'src/',
