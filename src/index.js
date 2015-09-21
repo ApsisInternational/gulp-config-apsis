@@ -75,16 +75,9 @@ function setupConfig(_config) {
 class Apsis {
     constructor(_gulp, _config) {
         const gulp = gulpHelp(_gulp);
-
-
         this.config = setupConfig(_config);
 
-        this.config.lint = [
-            this.config.src + '**/*.js',
-            this.config.test + '**/*.js',
-            this.config.serve + '**/*.js',
-        ];
-
+        this.releaseFn(gulp, this.config);
         this.bumpFn(gulp, this.config);
         this.cleanFn(gulp, this.config);
         this.copyFn(gulp, this.config);
@@ -92,7 +85,6 @@ class Apsis {
         this.eslintFn(gulp, this.config);
         this.gitFn(gulp, this.config);
         this.npmFn(gulp, this.config);
-        this.releaseFn(gulp, this.config);
         this.serveFn(gulp, this.config);
         this.stylusFn(gulp, this.config);
         this.testFn(gulp, this.config);
@@ -118,7 +110,7 @@ class Apsis {
     cleanFn(gulp, config) {
         gulp.task('clean:dist', 'Delete the dist/ directory', () => {
             del([
-                config.dist.root,
+                config.paths.dist.root,
             ]);
         });
     }
@@ -127,7 +119,7 @@ class Apsis {
     copyFn(gulp, config) {
         gulp.task('copy:dist', 'Copy JS and HTML to dist/', () => {
             gulp.src([ 'src/**/*.js', 'src/**/*.html' ])
-                .pipe(gulp.dest(config.dist.root));
+                .pipe(gulp.dest(config.paths.dist.root));
         });
     }
 
@@ -148,14 +140,13 @@ class Apsis {
         gulp.task('eslint', 'Lint your JavaScript with ESLint', () => {
             const condition = !!gutil.env.kill ? true : false;
 
-            return gulp.src(config.lint)
+            return gulp.src(config.paths.lint)
                 .pipe(eslint())
-                .pipe(eslint.format())
-                .pipe(gif(condition, eslint.failOnError()));
+                .pipe(eslint.format());
         });
 
         gulp.task('eslint:fail', false, () => {
-            return gulp.src(config.lint)
+            return gulp.src(config.paths.lint)
                 .pipe(eslint())
                 .pipe(eslint.format())
                 .pipe(eslint.failOnError());
@@ -256,7 +247,7 @@ class Apsis {
                 compress: false,
             };
 
-            if ( !!config.stylusInclude ) {
+            if ( !!config.paths.stylusInclude ) {
                 defaultOptions.include = config.stylusInclude;
             }
 
@@ -267,12 +258,12 @@ class Apsis {
         gulp.task('stylus', 'Compile stylus files into src/stylesheets.', () => {
             const options = getStylusOptions();
 
-            return gulp.src(config.stylesheets + '**/*.styl')
+            return gulp.src(config.paths.stylesheets + '**/*.styl')
                 .pipe(sourcemaps.init())
                 .pipe(stylus(options))
                 .pipe(autoprefixer())
                 .pipe(sourcemaps.write())
-                .pipe(gulp.dest(config.stylesheets));
+                .pipe(gulp.dest(config.paths.stylesheets));
         }, {
             aliases: [ 'styles' ],
         });
@@ -282,24 +273,24 @@ class Apsis {
                 compress: true,
             });
 
-            return gulp.src(config.stylesheets + '**/*.styl')
+            return gulp.src(config.paths.stylesheets + '**/*.styl')
                 .pipe(stylus(options))
                 .pipe(autoprefixer())
-                .pipe(gulp.dest(config.dist.stylesheets));
+                .pipe(gulp.dest(config.paths.dist.stylesheets));
         });
     }
 
 
-    testFn(gulp) {
+    testFn(gulp, config) {
         gulp.task('test', 'Run Karma tests', done => {
             new Server({
-                configFile: process.cwd() + '/test/karma.conf.js',
+                configFile: process.cwd() + config.paths.karmaConf,
             }, done).start();
         });
 
         gulp.task('tdd', 'Run Karma tests', done => {
             new Server({
-                configFile: process.cwd() + '/test/karma.conf.js',
+                configFile: process.cwd() + config.paths.karmaConf,
             }, done).start();
         });
     }
@@ -307,8 +298,8 @@ class Apsis {
 
     watchFn(gulp, config) {
         gulp.task('watch', false, () => {
-            gulp.watch(config.lint, ['eslint']);
-            gulp.watch(config.stylesheets + '**/*.styl', ['stylus']);
+            gulp.watch(config.paths.lint, ['eslint']);
+            gulp.watch(config.paths.stylesheets + '**/*.styl', ['stylus']);
         });
     }
 
