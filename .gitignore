@@ -1,0 +1,8 @@
+# PACKAGES
+node_modules/
+
+# BUILT FILES
+dist/
+
+# OTHER
+tags
