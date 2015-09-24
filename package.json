@@ -34,6 +34,7 @@
     "browser-sync": "^2.9.3",
     "del": "^2.0.2",
     "eslint-config-apsis": "~0",
+    "glob": "^5.0.14",
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^3.0.1",
     "gulp-bump": "^0.3.1",
