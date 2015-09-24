@@ -328,7 +328,7 @@ class Apsis {
     watchFn(gulp, config) {
         gulp.task('watch', false, () => {
             gulp.watch(config.paths.lint.js, ['eslint']);
-            gulp.watch(config.paths.stylesheets + '**/*.styl', ['stylus']);
+            gulp.watch(config.paths.src.stylesheets + '**/*.styl', ['stylus']);
         });
     }
 
