@@ -8,7 +8,6 @@ import nib from 'nib';
 /** Gulp plugins **/
 import gulpHelp from 'gulp-help';
 import gutil from 'gulp-util';
-import gif from 'gulp-if';
 import git from 'gulp-git';
 import eslint from 'gulp-eslint';
 import bump from 'gulp-bump';
@@ -130,7 +129,7 @@ class Apsis {
                 'npm:install',
                 [ 'stylus', 'eslint' ],
                 'watch',
-                'serve',
+                'serve'
             );
         });
     }
