@@ -4,6 +4,7 @@ import { Server } from 'karma';
 import del from 'del';
 import runSequence from 'run-sequence';
 import nib from 'nib';
+import glob from 'glob';
 
 /** Gulp plugins **/
 import gulpHelp from 'gulp-help';
@@ -79,6 +80,7 @@ function setupConfig(_config) {
                     'demo/**/*.js',
                 ],
             },
+            stylusInclude: glob.sync(process.cwd() + '/jspm_packages/apsis/tenko*/'),
         },
     };
 
