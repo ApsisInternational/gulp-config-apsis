@@ -126,12 +126,12 @@ class Apsis {
 
     defaultFn(gulp) {
         gulp.task('default', 'Sets up the dev environment', () => {
-            return runSequence.use(gulp)([
+            return runSequence.use(gulp)(
                 'npm:install',
                 [ 'stylus', 'eslint' ],
                 'watch',
                 'serve',
-            ]);
+            );
         });
     }
 
@@ -248,7 +248,7 @@ class Apsis {
             };
 
             if ( !!config.paths.stylusInclude ) {
-                defaultOptions.include = config.stylusInclude;
+                defaultOptions.include = config.paths.stylusInclude;
             }
 
             return Object.assign(defaultOptions, _options);
