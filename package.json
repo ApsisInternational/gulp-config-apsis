@@ -10,8 +10,7 @@
   ],
   "scripts": {
     "compile": "babel src --out-dir dist --optional runtime",
-    "prepublish": "npm run-script compile",
-    "postinstall": "npm run-script compile"
+    "prepublish": "npm run-script compile"
   },
   "main": "dist/index.js",
   "repository": {
