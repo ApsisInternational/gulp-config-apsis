@@ -49,22 +49,36 @@ function isObj(x) {
 function setupConfig(_config) {
     const defaultConfig = {
         paths: {
-            src: 'src/',
-            karmaConf: 'test/karma.conf.js',
-            stylesheets: 'stylesheets/',
-            jsSrc: 'javascript/',
-            test: 'test/',
-            unitTests: 'test/unit/',
-            serve: 'demo/',
+            root: './',
+            src: {
+                root: 'src/',
+                html: 'src/templates/',
+                images: 'src/images/',
+                javascript: 'src/javascript/',
+                stylesheets: 'src/stylesheets/',
+            },
             dist: {
                 root: 'dist/',
+                html: 'dist/templates/',
+                images: 'dist/images/',
+                javascript: 'dist/javascript/',
                 stylesheets: 'dist/stylesheets/',
             },
-            lint: [
-                'src/**/*.js',
-                'test/**/*.js',
-                'demo/**/*.js',
-            ],
+            config: {
+                karma: 'test/karma.conf.js',
+            },
+            test: {
+                unit: 'test/unit/',
+                e2e: 'test/e2e',
+            },
+            serve: 'demo/',
+            lint: {
+                js: [
+                    'src/**/*.js',
+                    'test/**/*.js',
+                    'demo/**/*.js',
+                ],
+            },
         },
     };
 
@@ -75,6 +89,8 @@ class Apsis {
     constructor(_gulp, _config) {
         const gulp = gulpHelp(_gulp);
         this.config = setupConfig(_config);
+
+        this.options = gutil.env;
 
         this.releaseFn(gulp, this.config);
         this.bumpFn(gulp, this.config);
@@ -91,13 +107,13 @@ class Apsis {
     }
 
 
-    bumpFn(gulp) {
+    bumpFn(gulp, config) {
         gulp.task('bump', 'Bump the package version in package.json', () => {
             const type = gutil.env.bump || 'patch';
 
-            gulp.src('./package.json')
+            gulp.src(config.paths.root + 'package.json')
                 .pipe(bump({type}))
-                .pipe(gulp.dest('./'));
+                .pipe(gulp.dest(config.paths.root));
         }, {
             options: {
                 'bump': 'what bump to perform. [ patch, minor, major]',
@@ -117,7 +133,10 @@ class Apsis {
 
     copyFn(gulp, config) {
         gulp.task('copy:dist', 'Copy JS and HTML to dist/', () => {
-            gulp.src([ 'src/**/*.js', 'src/**/*.html' ])
+            gulp.src([
+                config.paths.src.root + '**/*.js',
+                config.paths.src.root + '**/*.html',
+            ])
                 .pipe(gulp.dest(config.paths.dist.root));
         });
     }
@@ -125,27 +144,36 @@ class Apsis {
 
     defaultFn(gulp) {
         gulp.task('default', 'Sets up the dev environment', () => {
-            return runSequence.use(gulp)(
-                'npm:install',
+            const taskArr = [
                 [ 'stylus', 'eslint' ],
                 'watch',
-                'serve'
-            );
+                'serve',
+            ];
+
+            if ( !this.options.skipinstall ) {
+                taskArr.unshift('npm:install');
+            } else {
+                gutil.log(gutil.colors.red('Skipping npm installation process.'));
+            }
+
+            return runSequence.use(gulp).apply(gulp, taskArr);
+        }, {
+            options: {
+                'skipinstall': 'add to skip npm install at the top of the task',
+            },
         });
     }
 
 
     eslintFn(gulp, config) {
         gulp.task('eslint', 'Lint your JavaScript with ESLint', () => {
-            const condition = !!gutil.env.kill ? true : false;
-
-            return gulp.src(config.paths.lint)
+            return gulp.src(config.paths.lint.js)
                 .pipe(eslint())
                 .pipe(eslint.format());
         });
 
         gulp.task('eslint:fail', false, () => {
-            return gulp.src(config.paths.lint)
+            return gulp.src(config.paths.lint.js)
                 .pipe(eslint())
                 .pipe(eslint.format())
                 .pipe(eslint.failOnError());
@@ -201,20 +229,20 @@ class Apsis {
     }
 
 
-    serveFn(gulp) {
+    serveFn(gulp, config) {
         const browserSync = bs.create();
 
         gulp.task('serve', 'Create a server instance on localhost:9000', () => {
             const browserSyncOptions = {
                 port: 9000,
-                startPath: 'demo/',
+                startPath: config.paths.serve,
                 files: [
-                    'demo/*.html',
-                    'demo/*.js',
-                    'src/javascript/*.js',
-                    'src/images/**/*',
-                    'src/templates/*.html',
-                    'src/stylesheets/*.css',
+                    config.paths.serve + '*.html',
+                    config.paths.serve + '*.js',
+                    config.paths.src.javascript + 'src/javascript/**/*.js',
+                    config.paths.src.images + '**/*',
+                    config.paths.src.html + '*.html',
+                    config.paths.src.stylesheets + '*.css',
                 ],
                 open: !!gutil.env.browser,
                 server: {
@@ -257,12 +285,12 @@ class Apsis {
         gulp.task('stylus', 'Compile stylus files into src/stylesheets.', () => {
             const options = getStylusOptions();
 
-            return gulp.src(config.paths.stylesheets + '**/*.styl')
+            return gulp.src(config.paths.src.stylesheets + '**/*.styl')
                 .pipe(sourcemaps.init())
                 .pipe(stylus(options))
                 .pipe(autoprefixer())
                 .pipe(sourcemaps.write())
-                .pipe(gulp.dest(config.paths.stylesheets));
+                .pipe(gulp.dest(config.paths.src.stylesheets));
         }, {
             aliases: [ 'styles' ],
         });
@@ -272,7 +300,7 @@ class Apsis {
                 compress: true,
             });
 
-            return gulp.src(config.paths.stylesheets + '**/*.styl')
+            return gulp.src(config.paths.src.stylesheets + '**/*.styl')
                 .pipe(stylus(options))
                 .pipe(autoprefixer())
                 .pipe(gulp.dest(config.paths.dist.stylesheets));
@@ -283,13 +311,13 @@ class Apsis {
     testFn(gulp, config) {
         gulp.task('test', 'Run Karma tests', done => {
             new Server({
-                configFile: process.cwd() + config.paths.karmaConf,
+                configFile: process.cwd() + config.paths.config.karma,
             }, done).start();
         });
 
         gulp.task('tdd', 'Run Karma tests', done => {
             new Server({
-                configFile: process.cwd() + config.paths.karmaConf,
+                configFile: process.cwd() + config.paths.config.karma,
             }, done).start();
         });
     }
@@ -297,7 +325,7 @@ class Apsis {
 
     watchFn(gulp, config) {
         gulp.task('watch', false, () => {
-            gulp.watch(config.paths.lint, ['eslint']);
+            gulp.watch(config.paths.lint.js, ['eslint']);
             gulp.watch(config.paths.stylesheets + '**/*.styl', ['stylus']);
         });
     }
