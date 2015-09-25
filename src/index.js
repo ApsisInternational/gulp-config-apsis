@@ -74,13 +74,16 @@ function setupConfig(_config) {
             },
             serve: 'demo/',
             lint: {
-                js: [
-                    'src/**/*.js',
-                    'test/**/*.js',
-                    'demo/**/*.js',
-                ],
+                js: ['src/**/*.js', 'test/**/*.js', 'demo/**/*.js'],
+            },
+            watch: {
+                stylesheets: false,
+                javascript: false,
             },
             stylusInclude: glob.sync(process.cwd() + '/jspm_packages/apsis/tenko*/'),
+        },
+        options: {
+            'stylusTenkoTimeout': 500,
         },
     };
 
@@ -297,6 +300,20 @@ class Apsis {
             aliases: [ 'styles' ],
         });
 
+        gulp.task('stylus:tenko', false, cb => {
+            const options = getStylusOptions();
+
+            setTimeout(() => {
+                gulp.src(config.paths.src.stylesheets + '**/*.styl')
+                    .pipe(sourcemaps.init())
+                    .pipe(stylus(options))
+                    .pipe(autoprefixer())
+                    .pipe(sourcemaps.write())
+                    .pipe(gulp.dest(config.paths.src.stylesheets))
+                    .on('end', cb);
+            }, config.options.stylusTenkoTimeout);
+        });
+
         gulp.task('stylus:dist', false, () => {
             const options = getStylusOptions({
                 compress: true,
@@ -326,9 +343,20 @@ class Apsis {
 
 
     watchFn(gulp, config) {
+        const stylusWatchPath = config.paths.watch.stylesheets || config.paths.src.stylesheets + '**/*.styl';
+        let stylusTask = ['stylus'];
+
+        if ( !!gutil.env.tenko ) {
+            stylusTask = [ 'stylus:tenko' ];
+        }
+
         gulp.task('watch', false, () => {
             gulp.watch(config.paths.lint.js, ['eslint']);
-            gulp.watch(config.paths.src.stylesheets + '**/*.styl', ['stylus']);
+            gulp.watch(stylusWatchPath, stylusTask);
+        }, {
+            options: {
+                'tenko': 'run a special tenko task, that makes it possible to used a linked Tenko package',
+            },
         });
     }
 
