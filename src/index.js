@@ -330,13 +330,13 @@ class Apsis {
     testFn(gulp, config) {
         gulp.task('test', 'Run Karma tests', done => {
             new Server({
-                configFile: process.cwd() + config.paths.config.karma,
+                configFile: process.cwd() + '/' + config.paths.config.karma,
             }, done).start();
         });
 
         gulp.task('tdd', 'Run Karma tests', done => {
             new Server({
-                configFile: process.cwd() + config.paths.config.karma,
+                configFile: process.cwd() + '/' + config.paths.config.karma,
             }, done).start();
         });
     }
