@@ -244,7 +244,7 @@ class Apsis {
                 files: [
                     config.paths.serve + '*.html',
                     config.paths.serve + '*.js',
-                    config.paths.src.javascript + 'src/javascript/**/*.js',
+                    config.paths.src + '**/*.js',
                     config.paths.src.images + '**/*',
                     config.paths.src.html + '*.html',
                     config.paths.src.stylesheets + '*.css',
