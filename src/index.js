@@ -121,7 +121,7 @@ class Apsis {
                 .pipe(gulp.dest(config.paths.root));
         }, {
             options: {
-                'bump': 'what bump to perform. [ patch, minor, major]',
+                'bump [type]': 'what bump to perform. [patch, minor, major]',
             },
         });
     }
