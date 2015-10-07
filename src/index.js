@@ -339,6 +339,11 @@ class Apsis {
                 configFile: process.cwd() + '/' + config.paths.config.karma,
             }, done).start();
         });
+
+        gulp.task('run-protractor', function(done) {
+            Apsis.runExec('live-server --no-browser', done);
+            Apsis.runExec('protractor test/protractor.conf.js', done);
+        });
     }
 
 
