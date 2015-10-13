@@ -15,6 +15,7 @@ import bump from 'gulp-bump';
 import stylus from 'gulp-stylus';
 import sourcemaps from 'gulp-sourcemaps';
 import autoprefixer from 'gulp-autoprefixer';
+import protractor from 'gulp-protractor';
 
 
 function deepAssign(target, ...rest) {
@@ -67,6 +68,7 @@ function setupConfig(_config) {
             },
             config: {
                 karma: 'test/karma.conf.js',
+                protractor: 'test/protractor.conf.js',
             },
             test: {
                 unit: 'test/unit/',
@@ -104,6 +106,7 @@ class Apsis {
         this.defaultFn(gulp, this.config);
         this.eslintFn(gulp, this.config);
         this.gitFn(gulp, this.config);
+        this.protractorFn(gulp, this.config);
         this.npmFn(gulp, this.config);
         this.serveFn(gulp, this.config);
         this.stylusFn(gulp, this.config);
@@ -208,6 +211,20 @@ class Apsis {
 
         gulp.task('npm:update', 'Run npm install', (cb) => {
             Apsis.runExec('npm update', cb);
+        });
+    }
+
+
+    protractorFn(gulp, config) {
+        gulp.task('e2e', 'Run e2e tests with Protractor', (cb) => {
+            gulp.src(config.paths.test.e2e + '/*.spec.js')
+                .pipe(protractor.protractor({
+                    configFile: config.paths.config.protractor,
+                }))
+                .on('end', () => { cb(); })
+                .on('error', e => { throw e;});
+        }, {
+            aliases: [ 'protractor' ],
         });
     }
 
@@ -329,15 +346,17 @@ class Apsis {
 
     testFn(gulp, config) {
         gulp.task('test', 'Run Karma tests', done => {
-            new Server({
+            Server.start({
                 configFile: process.cwd() + '/' + config.paths.config.karma,
-            }, done).start();
+                singleRun: true,
+            }, done);
         });
 
         gulp.task('tdd', 'Run Karma tests', done => {
-            new Server({
+            Server.start({
                 configFile: process.cwd() + '/' + config.paths.config.karma,
-            }, done).start();
+                singleRun: false,
+            }, done);
         });
     }
 
