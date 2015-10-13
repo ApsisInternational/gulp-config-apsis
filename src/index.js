@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import bs from 'browser-sync';
 import { Server } from 'karma';
+import { parseConfig } from 'karma/lib/config';
 import del from 'del';
 import runSequence from 'run-sequence';
 import nib from 'nib';
@@ -345,18 +346,30 @@ class Apsis {
 
 
     testFn(gulp, config) {
-        gulp.task('test', 'Run Karma tests', done => {
-            Server.start({
-                configFile: process.cwd() + '/' + config.paths.config.karma,
+        const karmaConfigFilePath = process.cwd() + '/' + config.paths.config.karma;
+
+        function runKarma(configFilePath, options, cb) {
+            const parsedKarmaConfig = parseConfig(configFilePath, {});
+
+            Object.keys(options).forEach(key => {
+                parsedKarmaConfig[key] = options[key];
+            });
+
+            Server.start(parsedKarmaConfig, exitCode => {
+                cb();
+                process.exit(exitCode);
+            });
+        }
+
+
+        gulp.task('test', 'Run Karma tests', (done) => {
+            runKarma(karmaConfigFilePath, {
                 singleRun: true,
             }, done);
         });
 
         gulp.task('tdd', 'Run Karma tests', done => {
-            Server.start({
-                configFile: process.cwd() + '/' + config.paths.config.karma,
-                singleRun: false,
-            }, done);
+            runKarma(karmaConfigFilePath, {}, done);
         });
     }
 
