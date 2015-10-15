@@ -98,7 +98,7 @@ class Apsis {
         this.options = gutil.env;
 
         this.releaseFn(gulp, this.config);
-        this.bumpFn(gulp, this.config);
+        this.versionFn(gulp, this.config);
         this.cleanFn(gulp, this.config);
         this.copyFn(gulp, this.config);
         this.defaultFn(gulp, this.config);
@@ -109,21 +109,6 @@ class Apsis {
         this.stylusFn(gulp, this.config);
         this.testFn(gulp, this.config);
         this.watchFn(gulp, this.config);
-    }
-
-
-    bumpFn(gulp, config) {
-        gulp.task('bump', 'Bump the package version in package.json', () => {
-            const type = gutil.env.bump || 'patch';
-
-            gulp.src(config.paths.root + 'package.json')
-                .pipe(bump({type}))
-                .pipe(gulp.dest(config.paths.root));
-        }, {
-            options: {
-                'bump [type]': 'what bump to perform. [ patch, minor, major ]',
-            },
-        });
     }
 
 
@@ -187,7 +172,7 @@ class Apsis {
 
 
     gitFn(gulp) {
-        gulp.task('commit:bump', false, () => {
+        gulp.task('commit:version', false, () => {
             return gulp.src('.')
                 .pipe(git.add())
                 .pipe(git.commit('[Prerelease] Bump version number'));
@@ -219,8 +204,8 @@ class Apsis {
                 'eslint:fail',
                 [ 'copy:dist', 'stylus:dist' ],
                 'commit:dist',
-                'bump',
-                'commit:bump',
+                'version',
+                'commit:version',
                 error => {
                     if (error) {
                         gutil.log(error.message);
@@ -338,6 +323,22 @@ class Apsis {
             new Server({
                 configFile: process.cwd() + '/' + config.paths.config.karma,
             }, done).start();
+        });
+    }
+
+
+    versionFn(gulp, config) {
+        gulp.task('version', 'Bump the package version in package.json', () => {
+            const type = gutil.env.bump || 'patch';
+
+            gulp.src(config.paths.root + 'package.json')
+                .pipe(bump({type}))
+                .pipe(gulp.dest(config.paths.root));
+        }, {
+            options: {
+                'bump [type]': 'what bump to perform. [ patch, minor, major ]',
+            },
+            aliases: [ 'bump' ],
         });
     }
 
