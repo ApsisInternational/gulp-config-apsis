@@ -216,7 +216,7 @@ class Apsis {
 
 
     releaseFn(gulp) {
-        gulp.task('release', done => {
+        gulp.task('release', 'Run a series of tasks to build, commit and tag your project' done => {
             runSequence.use(gulp)(
                 'clean:dist',
                 'eslint:fail',
