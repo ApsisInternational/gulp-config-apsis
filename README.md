@@ -13,7 +13,7 @@ Install gulp and this package from npm: `npm install --save-dev gulp gulp-config
 
 ## Usage
 
-Add the following to your gulpfile
+Add the following to your gulpfilec
 
 ```js
 import gulp from 'gulp';
