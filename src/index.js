@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import bs from 'browser-sync';
 import { Server } from 'karma';
+import { parseConfig } from 'karma/lib/config';
 import del from 'del';
 import runSequence from 'run-sequence';
 import nib from 'nib';
@@ -15,6 +16,7 @@ import bump from 'gulp-bump';
 import stylus from 'gulp-stylus';
 import sourcemaps from 'gulp-sourcemaps';
 import autoprefixer from 'gulp-autoprefixer';
+import protractor from 'gulp-protractor';
 
 
 function deepAssign(target, ...rest) {
@@ -67,6 +69,7 @@ function setupConfig(_config) {
             },
             config: {
                 karma: 'test/karma.conf.js',
+                protractor: 'test/protractor.conf.js',
             },
             test: {
                 unit: 'test/unit/',
@@ -104,6 +107,7 @@ class Apsis {
         this.defaultFn(gulp, this.config);
         this.eslintFn(gulp, this.config);
         this.gitFn(gulp, this.config);
+        this.protractorFn(gulp, this.config);
         this.npmFn(gulp, this.config);
         this.serveFn(gulp, this.config);
         this.stylusFn(gulp, this.config);
@@ -197,6 +201,20 @@ class Apsis {
     }
 
 
+    protractorFn(gulp, config) {
+        gulp.task('e2e', 'Run e2e tests with Protractor', (cb) => {
+            gulp.src(config.paths.test.e2e + '/*.spec.js')
+                .pipe(protractor.protractor({
+                    configFile: config.paths.config.protractor,
+                }))
+                .on('end', () => { cb(); })
+                .on('error', e => { throw e;});
+        }, {
+            aliases: [ 'protractor' ],
+        });
+    }
+
+
     releaseFn(gulp) {
         gulp.task('release', done => {
             runSequence.use(gulp)(
@@ -229,7 +247,7 @@ class Apsis {
                 files: [
                     config.paths.serve + '*.html',
                     config.paths.serve + '*.js',
-                    config.paths.src + '**/*.js',
+                    config.paths.src.root + '**/*.js',
                     config.paths.src.images + '**/*',
                     config.paths.src.html + '*.html',
                     config.paths.src.stylesheets + '*.css',
@@ -313,16 +331,30 @@ class Apsis {
 
 
     testFn(gulp, config) {
-        gulp.task('test', 'Run Karma tests', done => {
-            new Server({
-                configFile: process.cwd() + '/' + config.paths.config.karma,
-            }, done).start();
+        const karmaConfigFilePath = process.cwd() + '/' + config.paths.config.karma;
+
+        function runKarma(configFilePath, options, cb) {
+            const parsedKarmaConfig = parseConfig(configFilePath, {});
+
+            Object.keys(options).forEach(key => {
+                parsedKarmaConfig[key] = options[key];
+            });
+
+            Server.start(parsedKarmaConfig, exitCode => {
+                cb();
+                process.exit(exitCode);
+            });
+        }
+
+
+        gulp.task('test', 'Run Karma tests', (done) => {
+            runKarma(karmaConfigFilePath, {
+                singleRun: true,
+            }, done);
         });
 
         gulp.task('tdd', 'Run Karma tests', done => {
-            new Server({
-                configFile: process.cwd() + '/' + config.paths.config.karma,
-            }, done).start();
+            runKarma(karmaConfigFilePath, {}, done);
         });
     }
 
