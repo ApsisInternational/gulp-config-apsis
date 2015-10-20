@@ -6,6 +6,7 @@ import del from 'del';
 import runSequence from 'run-sequence';
 import nib from 'nib';
 import glob from 'glob';
+import conventionalRecommendedBump from 'conventional-recommended-bump';
 
 /** Gulp plugins **/
 import gulpHelp from 'gulp-help';
@@ -233,6 +234,14 @@ class Apsis {
                     done(error);
                 }
             );
+        });
+
+        gulp.task('release:suggestion', 'Suggest what kind of version bump to perform', () => {
+            conventionalRecommendedBump({preset: 'angular'}, (n, releaseAs) => {
+                gutil.log(gutil.colors.inverse('Recommended bump:', releaseAs));
+            });
+        }, {
+            aliases: 'suggestion',
         });
     }
 
