@@ -179,13 +179,13 @@ class Apsis {
         gulp.task('commit:version', false, () => {
             return gulp.src('.')
                 .pipe(git.add())
-                .pipe(git.commit('[Prerelease] Bump version number'));
+                .pipe(git.commit('chore: Bump version number pre-release'));
         });
 
         gulp.task('commit:dist', false, () => {
             return gulp.src('.')
                 .pipe(git.add())
-                .pipe(git.commit('[Prerelease] Update dist/ files'));
+                .pipe(git.commit('chore: Update dist/ files pre-release'));
         });
     }
 
