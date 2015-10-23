@@ -7,6 +7,7 @@ import runSequence from 'run-sequence';
 import nib from 'nib';
 import glob from 'glob';
 import conventionalRecommendedBump from 'conventional-recommended-bump';
+import conventionalChangelog from 'conventional-changelog';
 
 /** Gulp plugins **/
 import gulpHelp from 'gulp-help';
@@ -236,7 +237,10 @@ class Apsis {
             );
         });
 
-        gulp.task('release:suggestion', 'Suggest what kind of version bump to perform', () => {
+        gulp.task('release:changelog', 'Generate a changelog for a new release', () => {
+            conventionalChangelog({ preset: 'angular'})
+                .pipe(process.stdout);
+        });
             conventionalRecommendedBump({preset: 'angular'}, (n, releaseAs) => {
                 gutil.log(gutil.colors.inverse('Recommended bump:', releaseAs));
             });
