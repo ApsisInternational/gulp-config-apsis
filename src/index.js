@@ -241,8 +241,11 @@ class Apsis {
             conventionalChangelog({ preset: 'angular'})
                 .pipe(process.stdout);
         });
+
+        gulp.task('release:suggestion', 'Suggest what kind of version bump to perform', done => {
             conventionalRecommendedBump({preset: 'angular'}, (n, releaseAs) => {
                 gutil.log(gutil.colors.inverse('Recommended bump:', releaseAs));
+                done();
             });
         }, {
             aliases: 'suggestion',
