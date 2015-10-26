@@ -23,7 +23,7 @@ function releaseTasks(gulp) {
             desc: 'Suggest what kind of version bump to perform',
             fn: releaseSuggestion,
             help: {
-                aliases: 'suggestion',
+                aliases: ['suggestion'],
             },
         });
 
