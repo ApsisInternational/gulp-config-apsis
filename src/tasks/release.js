@@ -32,9 +32,10 @@ function releaseTasks(gulp) {
         runSequence.use(gulp)(
             'clean:dist',
             'eslint:fail',
+            'test:fail',
             [ 'copy:dist', 'stylus:dist' ],
             'commit:dist',
-            'version',
+            'version:branch',
             'commit:version',
             error => {
                 if (error) {
