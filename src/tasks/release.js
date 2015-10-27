@@ -1,5 +1,7 @@
 import { taskMaker } from '../taskMaker';
 
+import fs from 'fs';
+
 import runSequence from 'run-sequence';
 import gutil from 'gulp-util';
 import conventionalRecommendedBump from 'conventional-recommended-bump';
@@ -41,9 +43,25 @@ function releaseTasks(gulp) {
                 if (error) {
                     gutil.log(error.message);
                 } else {
-                    gutil.log('RELEASE FINISHED SUCCESSFULLY');
+                    const pkg = JSON.parse(fs.readFileSync(process.cwd() + '/package.json', 'utf8'));
+
+                    gutil.log(gutil.colors.inverse(`Release ${pkg.version} finished successfully! :D`));
+                    gutil.log(gutil.colors.blue('Operations performed:'));
+                    gutil.log(gutil.colors.blue(' • Linted all JS'));
+                    gutil.log(gutil.colors.blue(' • Ran all unit tests'));
+                    gutil.log(gutil.colors.blue(' • Copied JS files to dist/'));
+                    gutil.log(gutil.colors.blue(' • Compiled Stylus files to dist/'));
+                    gutil.log(gutil.colors.blue(' • Committed dist files'));
+                    gutil.log(gutil.colors.blue(` • Bumped version to ${pkg.version}`));
+                    gutil.log(gutil.colors.blue(' • Committed new version'));
+                    gutil.log(gutil.colors.blue('============================='));
+                    gutil.log(gutil.colors.inverse('What to do next:'));
+                    gutil.log(gutil.colors.blue(` • Finish the release by running git flow release finish ${pkg.version}`));
+                    gutil.log(gutil.colors.blue('============================='));
                 }
+
                 done(error);
+                process.exit(error);
             }
         );
     }
