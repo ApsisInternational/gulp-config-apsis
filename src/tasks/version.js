@@ -46,6 +46,10 @@ function versionTasks(gulp, config) {
 
             if (stdout) versionNumber = stdout.trim().match(/release\/(.+)/, 'i')[1];
 
+            if (typeof versionNumber !== 'string' || versionNumber.length !== 5) {
+                throw new Error('Could not read version number from branch');
+            }
+
             gulp.src(config.paths.root + 'package.json')
                 .pipe(bump({version: versionNumber}))
                 .pipe(gulp.dest(config.paths.root))
