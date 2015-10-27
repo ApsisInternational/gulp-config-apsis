@@ -31,13 +31,19 @@ function releaseTasks(gulp) {
 
 
     function release(done) {
+        let versionTask = 'version:branch';
+
+        if (gutil.env.bump) {
+            versionTask = 'version';
+        }
+
         runSequence.use(gulp)(
             'clean:dist',
             'eslint:fail',
             'test:fail',
             [ 'copy:dist', 'stylus:dist' ],
             'commit:dist',
-            'version:branch',
+            versionTask,
             'commit:version',
             error => {
                 if (error) {
