@@ -20,6 +20,10 @@ function testTasks(gulp, config) {
             fn: runTestsAndFailOnFail,
         })
         .createTask({
+            name: 'test:ci',
+            fn: runTestsAndExit,
+        })
+        .createTask({
             name: 'tdd',
             desc: 'Run continous Karma tests',
             fn: runTdd,
@@ -49,16 +53,27 @@ function testTasks(gulp, config) {
 
     function runTestsAndFailOnFail(done) {
         runKarma(karmaConfigFilePath, { singleRun: true }, done, exitCode => {
-            if (exitCode === 1) {
-                gutil.log(gutil.colors.red('=========================='));
-                gutil.log(gutil.colors.red('Unit tests failed, exiting.'));
-                gutil.log(gutil.colors.red('=========================='));
-
-                done('Unit tests failed');
-            } else {
-                done();
-            }
+            parseTestResults(exitCode, done);
         });
+    }
+
+    function runTestsAndExit(done) {
+        runKarma(karmaConfigFilePath, { singleRun: true }, done, exitCode => {
+            parseTestResults(exitCode, done);
+            process.exit(exitCode);
+        });
+    }
+
+    function parseTestResults(exitCode, done) {
+        if (exitCode === 1) {
+            gutil.log(gutil.colors.red('=========================='));
+            gutil.log(gutil.colors.red('Unit tests failed, exiting.'));
+            gutil.log(gutil.colors.red('=========================='));
+
+            done('Unit tests failed');
+        } else {
+            done();
+        }
     }
 
     function generateExitFn(cb) {
