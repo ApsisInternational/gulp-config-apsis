@@ -5,6 +5,7 @@ import { eslintTasks } from './tasks/eslint';
 import { gitTasks } from './tasks/git';
 import { npmTasks } from './tasks/npm';
 import { protractorTasks } from './tasks/protractor';
+import { pullRequestTasks } from './tasks/pullRequest';
 import { releaseTasks } from './tasks/release';
 import { serveTasks } from './tasks/serve';
 import { stylusTasks } from './tasks/stylus';
@@ -20,6 +21,7 @@ const tasks = [
     gitTasks,
     npmTasks,
     protractorTasks,
+    pullRequestTasks,
     releaseTasks,
     serveTasks,
     stylusTasks,
