@@ -14,7 +14,7 @@ function defaultTask(gulp) {
             fn: defaultFn,
             help: {
                 options: {
-                    'skipinstall': 'add to skip npm install at the top of the task',
+                    'install': 'add to skip npm install at the top of the task',
                 },
             },
         });
@@ -26,10 +26,9 @@ function defaultTask(gulp) {
             'serve',
         ];
 
-        if ( !options.skipinstall ) {
+        if ( options.install ) {
+            gutil.log(gutil.colors.red('Running npm installation process.'));
             taskArr.unshift('npm:install');
-        } else {
-            gutil.log(gutil.colors.red('Skipping npm installation process.'));
         }
 
         return runSequence.use(gulp).apply(gulp, taskArr);
