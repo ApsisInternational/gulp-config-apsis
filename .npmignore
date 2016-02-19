@@ -1,5 +1,11 @@
+# FOLDERS
 src/
 test/
+jspm_packages/
+
+# FILES
 .eslintignore
 .eslintrc
 .gitignore
+gulpfile.babel.js
+config.js

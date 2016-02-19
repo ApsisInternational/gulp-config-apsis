@@ -5,7 +5,7 @@ import fs from 'fs';
 import runSequence from 'run-sequence';
 import gutil from 'gulp-util';
 import conventionalRecommendedBump from 'conventional-recommended-bump';
-import conventionalChangelog from 'conventional-changelog';
+import conventionalChangelog from 'gulp-conventional-changelog';
 
 
 function releaseTasks(gulp) {
@@ -73,8 +73,13 @@ function releaseTasks(gulp) {
     }
 
     function releaseChangelog() {
-        conventionalChangelog({ preset: 'angular'})
-            .pipe(process.stdout);
+        return gulp.src('CHANGELOG.md', {
+            buffer: false,
+        })
+            .pipe(conventionalChangelog({
+                preset: 'angular',
+            }))
+            .pipe(gulp.dest(''));
     }
 
     function releaseSuggestion(done) {
