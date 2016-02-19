@@ -21,12 +21,6 @@ function versionTasks(gulp, config) {
         .createTask({
             name: 'version:branch',
             fn: versionFromBranch,
-            help: {
-                options: {
-                    'bump [type]': 'what bump to perform. [ patch, minor, major ]',
-                },
-                aliases: [ 'bump' ],
-            },
         });
 
 
