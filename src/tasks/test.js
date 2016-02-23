@@ -1,6 +1,7 @@
 import { taskMaker } from '../taskMaker';
 
 import gutil from 'gulp-util';
+import runSequence from 'run-sequence';
 
 import { Server } from 'karma';
 import { parseConfig } from 'karma/lib/config';
@@ -31,7 +32,7 @@ function testTasks(gulp, config) {
 
     function runKarma(configFilePath, options, cb, exitFn) {
         const parsedKarmaConfig = parseConfig(configFilePath, {});
-        const exit = !exitFn ?  generateExitFn(cb) : exitFn;
+        const exit = !exitFn ? generateExitFn(cb) : exitFn;
 
         Object.keys(options).forEach(key => {
             parsedKarmaConfig[key] = options[key];
@@ -42,27 +43,48 @@ function testTasks(gulp, config) {
 
 
     function runTests(done) {
-        runKarma(karmaConfigFilePath, {
-            singleRun: true,
-        }, done);
+        runSequence.use(gulp)(
+            'stylus',
+            () => {
+                runKarma(karmaConfigFilePath, {
+                    singleRun: true,
+                }, done);
+            }
+        );
     }
 
     function runTdd(done) {
-        runKarma(karmaConfigFilePath, {}, done);
+        runSequence.use(gulp)(
+            'stylus',
+            () => {
+                runKarma(karmaConfigFilePath, {}, done);
+            }
+        );
     }
 
     function runTestsAndFailOnFail(done) {
-        runKarma(karmaConfigFilePath, { singleRun: true }, done, exitCode => {
-            parseTestResults(exitCode, done);
-        });
+        runSequence.use(gulp)(
+            'stylus',
+            () => {
+                runKarma(karmaConfigFilePath, { singleRun: true }, done, exitCode => {
+                    parseTestResults(exitCode, done);
+                });
+            }
+        );
     }
 
     function runTestsAndExit(done) {
-        runKarma(karmaConfigFilePath, { singleRun: true }, done, exitCode => {
-            parseTestResults(exitCode, done);
-            process.exit(exitCode);
-        });
+        runSequence.use(gulp)(
+            'stylus',
+            () => {
+                runKarma(karmaConfigFilePath, { singleRun: true }, done, exitCode => {
+                    parseTestResults(exitCode, done);
+                    process.exit(exitCode);
+                });
+            }
+        );
     }
+
 
     function parseTestResults(exitCode, done) {
         if (exitCode === 1) {
