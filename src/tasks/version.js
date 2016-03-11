@@ -38,20 +38,23 @@ function versionTasks(gulp, config) {
         exec('git rev-parse --abbrev-ref HEAD', (err, stdout) => {
             if (err) return done(err);
 
-            if (stdout) {
-                const versionRegex = /release\/([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})/;
-                versionNumber = stdout.trim().match(versionRegex, 'i');
+            if (!stdout) {
+                process.exit(1);
+                throw new Error('Could not read from branch');
             }
 
-            // versionNumber should be an array with three matches, eg.
-            // [ 'release/1.0.0', '1', '0', '0' ]
+            const versionRegex = /release\/([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})/;
+            versionNumber = stdout.trim().match(versionRegex, 'i');
 
             if ( !Array.isArray(versionNumber) || versionNumber.length !== 4) {
+                process.exit(1);
                 throw new Error('Could not read version number from branch');
             }
 
+            versionNumber.shift();
+
             gulp.src(config.paths.root + 'package.json')
-                .pipe(bump({version: versionNumber}))
+                .pipe(bump({version: versionNumber.join('.')}))
                 .pipe(gulp.dest(config.paths.root))
                 .on('end', done);
         });
