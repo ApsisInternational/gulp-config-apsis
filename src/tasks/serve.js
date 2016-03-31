@@ -10,7 +10,7 @@ function serveTasks(gulp, config) {
         .createTask({
             name: 'serve',
             desc: 'Create a server instance on localhost:9000',
-            fn: browsersync,
+            fn: browsersyncFn,
             help: {
                 options: {
                     'browser': 'Open the given browser on init',
@@ -19,7 +19,7 @@ function serveTasks(gulp, config) {
         });
 
 
-    function browsersync() {
+    function browsersyncFn() {
         const browserSyncOptions = {
             port: 9000,
             startPath: config.paths.serve,
@@ -28,7 +28,7 @@ function serveTasks(gulp, config) {
                 config.paths.serve + '*.js',
                 config.paths.src.root + '**/*.js',
                 config.paths.src.images + '**/*',
-                config.paths.src.html + '*.html',
+                config.paths.src.root + '*.html',
                 config.paths.src.stylesheets + '*.css',
             ],
             open: !!gutil.env.browser,
