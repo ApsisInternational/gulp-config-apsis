@@ -28,7 +28,7 @@ function serveTasks(gulp, config) {
                 config.paths.serve + '*.js',
                 config.paths.src.root + '**/*.js',
                 config.paths.src.images + '**/*',
-                config.paths.src.root + '*.html',
+                config.paths.src.root + '**/*.html',
                 config.paths.src.stylesheets + '*.css',
             ],
             open: !!gutil.env.browser,
