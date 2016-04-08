@@ -8,7 +8,7 @@ import conventionalRecommendedBump from 'conventional-recommended-bump';
 import conventionalChangelog from 'gulp-conventional-changelog';
 
 
-function releaseTasks(gulp) {
+export function releaseTasks(gulp) {
     taskMaker(gulp)
         .createTask({
             name: 'release',
@@ -44,6 +44,7 @@ function releaseTasks(gulp) {
             [ 'copy:dist', 'stylus:dist' ],
             'commit:dist',
             versionTask,
+            'release:changelog',
             'commit:version',
             error => {
                 if (error) {
@@ -73,13 +74,14 @@ function releaseTasks(gulp) {
     }
 
     function releaseChangelog() {
-        return gulp.src('CHANGELOG.md', {
-            buffer: false,
-        })
+        makeSureFileExists('./CHANGELOG.md');
+
+        return gulp.src('./CHANGELOG.md')
             .pipe(conventionalChangelog({
                 preset: 'angular',
+                releaseCount: 0,
             }))
-            .pipe(gulp.dest(''));
+            .pipe(gulp.dest('./'));
     }
 
     function releaseSuggestion(done) {
@@ -88,6 +90,17 @@ function releaseTasks(gulp) {
             done();
         });
     }
-}
 
-export { releaseTasks };
+
+    function makeSureFileExists(path) {
+        try {
+            fs.statSync(path);
+        } catch (err) {
+            if (err.code === 'ENOENT') {
+                fs.writeFileSync(path, '');
+            } else {
+                throw new Error(err);
+            }
+        }
+    }
+}

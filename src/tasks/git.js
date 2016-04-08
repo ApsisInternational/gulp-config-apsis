@@ -19,7 +19,7 @@ function gitTasks(gulp) {
     function commitVersion() {
         return gulp.src('.')
             .pipe(git.add())
-            .pipe(git.commit('chore: Bump version number pre-release'));
+            .pipe(git.commit('chore: Bump version number and create changelog pre-release'));
     }
 
     function commitDist() {
