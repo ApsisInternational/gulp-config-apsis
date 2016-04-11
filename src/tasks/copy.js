@@ -12,6 +12,7 @@ function copyTasks(gulp, config) {
     function copyDist() {
         gulp.src([
             config.paths.src.root + '**/*.js',
+            config.paths.src.root + '**/*.json',
             config.paths.src.root + '**/*.html',
         ])
             .pipe(gulp.dest(config.paths.dist.root));
