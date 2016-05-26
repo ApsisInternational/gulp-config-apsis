@@ -14,6 +14,8 @@ function copyTasks(gulp, config) {
             config.paths.src.root + '**/*.js',
             config.paths.src.root + '**/*.json',
             config.paths.src.root + '**/*.html',
+            config.paths.root + 'README.md',
+            config.paths.root + 'CHANGELOG.md',
         ])
             .pipe(gulp.dest(config.paths.dist.root));
     }
