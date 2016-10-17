@@ -13,7 +13,7 @@ function runExec(cmd, cb) {
 export { runExec };
 
 
-function setupConfig(_config) {
+function setupConfig(_config = {}) {
     const defaultConfig = {
         paths: {
             root: './',
@@ -47,7 +47,9 @@ function setupConfig(_config) {
                 stylesheets: false,
                 javascript: false,
             },
-            bs: {},
+            bs: {
+                files: [],
+            },
             stylusInclude: glob.sync(process.cwd() + '/jspm_packages/apsis/tenko*/'),
         },
         options: {
@@ -55,20 +57,22 @@ function setupConfig(_config) {
         },
     };
 
-    const config = deepAssign({}, defaultConfig, _config);
+    defaultConfig.paths.bs.files = [
+        defaultConfig.paths.serve + '*.html',
+        defaultConfig.paths.serve + '*.js',
+        defaultConfig.paths.serve + '*.ts',
+        defaultConfig.paths.src.root + '**/*.js',
+        defaultConfig.paths.src.root + '**/*.ts',
+        defaultConfig.paths.src.images + '**/*',
+        defaultConfig.paths.src.root + '**/*.html',
+        defaultConfig.paths.src.stylesheets + '*.css',
+    ];
 
-    config.paths.bs.files = [].concat(_config.paths.bs.files, [
-        config.paths.serve + '*.html',
-        config.paths.serve + '*.js',
-        config.paths.serve + '*.ts',
-        config.paths.src.root + '**/*.js',
-        config.paths.src.root + '**/*.ts',
-        config.paths.src.images + '**/*',
-        config.paths.src.root + '**/*.html',
-        config.paths.src.stylesheets + '*.css',
-    ]);
+    if (_config && _config.paths && _config.paths.bs && Array.isArray(_config.paths.bs.files)) {
+        _config.paths.bs.files = defaultConfig.paths.bs.files.concat(_config.paths.bs.files);
+    }
 
-    return config;
+    return deepAssign({}, defaultConfig, _config);
 }
 
 export { setupConfig };
