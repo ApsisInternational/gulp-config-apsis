@@ -47,6 +47,7 @@ function setupConfig(_config) {
                 stylesheets: false,
                 javascript: false,
             },
+            bs: {},
             stylusInclude: glob.sync(process.cwd() + '/jspm_packages/apsis/tenko*/'),
         },
         options: {
@@ -54,7 +55,20 @@ function setupConfig(_config) {
         },
     };
 
-    return deepAssign({}, defaultConfig, _config);
+    const config = deepAssign({}, defaultConfig, _config);
+
+    config.paths.bs.files = [].concat(_config.paths.bs.files, [
+        config.paths.serve + '*.html',
+        config.paths.serve + '*.js',
+        config.paths.serve + '*.ts',
+        config.paths.src.root + '**/*.js',
+        config.paths.src.root + '**/*.ts',
+        config.paths.src.images + '**/*',
+        config.paths.src.root + '**/*.html',
+        config.paths.src.stylesheets + '*.css',
+    ]);
+
+    return config;
 }
 
 export { setupConfig };
@@ -73,11 +87,11 @@ function walkSource(_target, _source) {
     Object.keys(_source).forEach(key => {
         const value = _source[key];
 
-        if ( Array.isArray(value) ) {
+        if (Array.isArray(value)) {
             _target[key] = value.slice();
-        } else if ( isObj(value) ) {
+        } else if (isObj(value)) {
             _target[key] = deepAssign(_target[key] || {}, value);
-        } else if ( value !== undefined ) {
+        } else if (value !== undefined) {
             _target[key] = value;
         }
     });

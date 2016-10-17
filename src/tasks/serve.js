@@ -23,14 +23,7 @@ function serveTasks(gulp, config) {
         const browserSyncOptions = {
             port: 9000,
             startPath: config.paths.serve,
-            files: [
-                config.paths.serve + '*.html',
-                config.paths.serve + '*.js',
-                config.paths.src.root + '**/*.js',
-                config.paths.src.images + '**/*',
-                config.paths.src.root + '**/*.html',
-                config.paths.src.stylesheets + '*.css',
-            ],
+            files: config.paths.watch.files,
             open: !!gutil.env.browser,
             server: {
                 baseDir: ['./'],
@@ -41,7 +34,7 @@ function serveTasks(gulp, config) {
             },
         };
 
-        if (!!gutil.env.browser ) {
+        if (!!gutil.env.browser) {
             browserSyncOptions.browser = gutil.env.browser;
         }
 
